@@ -47,7 +47,7 @@ def config():
 def django(task=""):
     """Run the make target in the dev environment"""
     env.COMPOSE_FILE = 'dev.yml'
-    env.DJANGO_SETTINGS_MODULE = 'config.settings.local'
+    env.DJANGO_SETTINGS_MODULE = 'fintify.settings.local'
     vars = dict(COMPOSE_FILE=env.COMPOSE_FILE,
                 DJANGO_SETTINGS_MODULE=env.DJANGO_SETTINGS_MODULE)
     with shell_env(**vars):
@@ -64,7 +64,7 @@ def test(watch="false", shippable="false"):
         env.COMPOSE_FILE = 'shippable-test.yml'
     else:
         env.COMPOSE_FILE = 'dev-test.yml'
-    env.DJANGO_SETTINGS_MODULE = 'config.settings.test'
+    env.DJANGO_SETTINGS_MODULE = 'fintify.settings.test'
     env.PYTEST_WATCH = '1' if watch == 'true' else '0'
     vars = dict(COMPOSE_FILE=env.COMPOSE_FILE,
                 DJANGO_SETTINGS_MODULE=env.DJANGO_SETTINGS_MODULE,
@@ -78,7 +78,7 @@ def test(watch="false", shippable="false"):
 def lint(runner='pylint'):
     """Run pylint in test profile."""
     env.COMPOSE_FILE = 'dev-test.yml'
-    env.DJANGO_SETTINGS_MODULE = 'config.settings.test'
+    env.DJANGO_SETTINGS_MODULE = 'fintify.settings.test'
     vars = dict(COMPOSE_FILE=env.COMPOSE_FILE,
                 DJANGO_SETTINGS_MODULE=env.DJANGO_SETTINGS_MODULE,)
     with shell_env(**vars):
@@ -93,7 +93,7 @@ def lint(runner='pylint'):
 def static():
     """Run collectstatic in dev profile"""
     env.COMPOSE_FILE = 'dev.yml'
-    env.DJANGO_SETTINGS_MODULE = 'config.settings.local'
+    env.DJANGO_SETTINGS_MODULE = 'fintify.settings.local'
     vars = dict(COMPOSE_FILE=env.COMPOSE_FILE,
                 DJANGO_SETTINGS_MODULE=env.DJANGO_SETTINGS_MODULE)
     with shell_env(**vars):
@@ -103,7 +103,7 @@ def static():
 def fixture():
     """Generate fixture data in test profile"""
     env.COMPOSE_FILE = 'dev-test.yml'
-    env.DJANGO_SETTINGS_MODULE = 'config.settings.local' # Intentionally use local settings for password hashing
+    env.DJANGO_SETTINGS_MODULE = 'fintify.settings.local' # Intentionally use local settings for password hashing
     vars = dict(COMPOSE_FILE=env.COMPOSE_FILE,
                 DJANGO_SETTINGS_MODULE=env.DJANGO_SETTINGS_MODULE,
                 PYTEST_WATCH='0')
@@ -120,22 +120,22 @@ def fixture():
 def prod():
     """Set environment as production"""
     env.COMPOSE_FILE = 'docker-compose.yml'
-    env.DJANGO_SETTINGS_MODULE = 'config.settings.production'
+    env.DJANGO_SETTINGS_MODULE = 'fintify.settings.production'
 
 @task
 def dev():
     """Set environment as local"""
     env.COMPOSE_FILE = 'dev.yml'
-    env.DJANGO_SETTINGS_MODULE = 'config.settings.local'
+    env.DJANGO_SETTINGS_MODULE = 'fintify.settings.local'
 
 @task
 def production():
     """Set environment as production"""
     env.COMPOSE_FILE = 'aws-rds-docker-compose.yml'
-    env.DJANGO_SETTINGS_MODULE = 'config.settings.production'
+    env.DJANGO_SETTINGS_MODULE = 'fintify.settings.production'
 
 @task
 def staging():
     """Set environment as staging"""
     env.COMPOSE_FILE = 'aws-rds-staging-docker-compose.yml'
-    env.DJANGO_SETTINGS_MODULE = 'config.settings.staging'
+    env.DJANGO_SETTINGS_MODULE = 'fintify.settings.staging'
