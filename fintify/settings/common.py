@@ -89,17 +89,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'fintify.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
-#Need to change the db settings 
-
 print(env.db('DATABASE_URL'))
 DATABASES = {
     'default': env.db('DATABASE_URL', default='postgres:///finchest'),
