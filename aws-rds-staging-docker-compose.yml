@@ -1,0 +1,97 @@
+version: '3'
+
+services:
+  django:
+    build:
+      context: .
+      dockerfile: ./compose/django/Dockerfile-aws
+      args:
+        PIP_ARGS: ${PIP_ARGS}
+    user: django
+    depends_on:
+      - redis
+    command: /uwsgi_aws.sh
+    environment:
+      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
+    env_file: .env
+    restart: always
+    ports:
+      - "0.0.0.0:5000:5000"
+
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://logs6.papertrailapp.com:46173"
+        tag: "{{.Name}}/{{.ID}}"
+
+  nginx:
+    build: ./compose/nginx
+    depends_on:
+      - django
+      - wordpress
+    volumes:
+      - ./compose/nginx/wordpress:/var/www/html
+
+    ports:
+      - "0.0.0.0:80:80"
+      - "0.0.0.0:443:443"
+  redis:
+    image: redis:latest
+
+
+  mysql:
+    image: mariadb
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./db-data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=aqwe123
+    restart: always
+
+  wordpress:
+    image: wordpress:4.7.1-php7.0-fpm
+    ports:
+      - '9000:9000'
+    volumes:
+      - ./compose/nginx/wordpress:/var/www/html
+    environment:
+      - WORDPRESS_DB_NAME=blog_live
+      - WORDPRESS_TABLE_PREFIX=wp_
+      - WORDPRESS_DB_HOST=mysql
+      - WORDPRESS_DB_PASSWORD=aqwe123
+    links:
+      - mysql
+    restart: always
+
+
+
+  # celeryworker:
+  #   build:
+  #     context: .
+  #     dockerfile: ./compose/django/Dockerfile
+  #     args:
+  #       PIP_ARGS: ${PIP_ARGS}
+  #   user: django
+  #   env_file: .env
+  #   environment:
+  #     - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
+  #   depends_on:
+  #    - postgres
+  #    - redis
+  #   command: celery -A config worker -l INFO
+
+  # celerybeat:
+  #   build:
+  #     context: .
+  #     dockerfile: ./compose/django/Dockerfile
+  #     args:
+  #       PIP_ARGS: ${PIP_ARGS}
+  #   user: django
+  #   env_file: .env
+  #   environment:
+  #     - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
+  #   depends_on:
+  #     - postgres
+  #     - redis
+  #   command: celery -A config beat -l INFO

@@ -1,0 +1,9 @@
+#!/bin/sh
+ssh ubuntu@35.176.66.47 <<EOF
+ cd backend
+ git pull origin staging
+ fab staging stop
+ fab staging build
+ fab staging up
+ exit
+EOF

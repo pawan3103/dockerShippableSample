@@ -1,0 +1,29 @@
+FROM python:3.6
+ARG PIP_ARGS=
+ENV PYTHONUNBUFFERED 1
+
+# Requirements have to be pulled and installed here, otherwise caching won't work
+COPY ./requirements /requirements
+
+RUN pip install -U pip $PIP_ARGS
+
+RUN pip install -r /requirements/production.txt $PIP_ARGS \
+    && groupadd -r django \
+    && useradd -r -g django django
+
+COPY . /app
+RUN chown -R django /app
+
+COPY ./compose/django/production.ini /production.ini
+COPY ./compose/django/uwsgi_aws.sh /uwsgi_aws.sh
+COPY ./compose/django/entrypoint.sh /entrypoint.sh
+RUN sed -i 's/\r//' /entrypoint.sh \
+    && sed -i 's/\r//' /uwsgi_aws.sh \
+    && chmod +x /entrypoint.sh \
+    && chown django /entrypoint.sh \
+    && chmod +x /uwsgi_aws.sh \
+    && chown django /uwsgi_aws.sh
+
+WORKDIR /app
+
+ENTRYPOINT ["/entrypoint.sh"]

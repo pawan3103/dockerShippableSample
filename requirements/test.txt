@@ -1,0 +1,20 @@
+# Test dependencies go here.
+-r local.txt
+
+
+responses==0.5.1
+django-test-plus==1.0.18
+factory-boy==2.8.1
+
+# pytest
+pytest-django==3.1.2
+pytest-sugar==0.8.0
+pytest-watch==4.1.0
+
+coverage==4.4.1
+flake8==3.3.0
+pylint==1.7.2
+pylint-common==0.2.5
+pylint-plugin-utils==0.2.6
+pylint-django==0.7.2
+pylint-celery==0.3

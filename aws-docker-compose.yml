@@ -1,0 +1,72 @@
+version: '3'
+
+volumes:
+  postgres_data: {}
+  postgres_backup: {}
+
+services:
+  postgres:
+    build: ./compose/postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - postgres_backup:/backups
+    env_file: .env
+
+  django:
+    build:
+      context: .
+      dockerfile: ./compose/django/Dockerfile-aws
+      args:
+        PIP_ARGS: ${PIP_ARGS}
+    user: django
+    depends_on:
+      - postgres
+      - redis
+    command: /uwsgi_aws.sh
+    environment:
+      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
+    env_file: .env
+    restart: always
+    ports:
+      - "0.0.0.0:5000:5000"
+
+  nginx:
+    build: ./compose/nginx
+    depends_on:
+      - django
+
+    ports:
+      - "0.0.0.0:80:80"
+
+  redis:
+    image: redis:latest
+
+  # celeryworker:
+  #   build:
+  #     context: .
+  #     dockerfile: ./compose/django/Dockerfile
+  #     args:
+  #       PIP_ARGS: ${PIP_ARGS}
+  #   user: django
+  #   env_file: .env
+  #   environment:
+  #     - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
+  #   depends_on:
+  #    - postgres
+  #    - redis
+  #   command: celery -A config worker -l INFO
+
+  # celerybeat:
+  #   build:
+  #     context: .
+  #     dockerfile: ./compose/django/Dockerfile
+  #     args:
+  #       PIP_ARGS: ${PIP_ARGS}
+  #   user: django
+  #   env_file: .env
+  #   environment:
+  #     - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
+  #   depends_on:
+  #     - postgres
+  #     - redis
+  #   command: celery -A config beat -l INFO

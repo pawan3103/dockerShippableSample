@@ -1,0 +1,26 @@
+FROM python:3.6
+ARG PIP_ARGS=
+ENV PYTHONUNBUFFERED 1
+
+RUN pip install -U pip $PIP_ARGS
+
+# Requirements have to be pulled and installed here, otherwise caching won't work
+
+COPY ./requirements /requirements
+RUN pip install -r /requirements/test.txt $PIP_ARGS
+
+COPY ./compose/django/entrypoint.sh /entrypoint.sh
+RUN sed -i 's/\r//' /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+COPY ./compose/django/start-test.sh /start-test.sh
+RUN sed -i 's/\r//' /start-test.sh
+RUN chmod +x /start-test.sh
+
+COPY ./compose/django/build-fixtures.sh /build-fixtures.sh
+RUN sed -i 's/\r//' /build-fixtures.sh
+RUN chmod +x /build-fixtures.sh
+
+WORKDIR /app
+
+ENTRYPOINT ["/entrypoint.sh"]

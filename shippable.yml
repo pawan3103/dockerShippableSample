@@ -1,0 +1,14 @@
+language: python
+
+python:
+  - 3.6
+
+build:
+  pre_ci_boot:
+    options: "-v /app:/app"
+  ci:
+    - cp env.example .env
+    - cp -R . /app
+    - pip install -U docker-compose fabric3==1.13.1.post1
+    - fab test:false,true
+    - docker-compose down
