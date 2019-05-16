@@ -1,4 +1,4 @@
-# README #
+# README for 2.0 setup #
 
 Backend for Fintify based on Django REST Framework
 
